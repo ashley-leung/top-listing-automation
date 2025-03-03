@@ -1,28 +1,46 @@
-import { By, until, WebDriver } from "selenium-webdriver";
+import { Page } from "puppeteer";
 
-async function refreshPageUntilElementFound(
-  driver: WebDriver,
-  locator: By,
-  retries = 3
-) {
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      return await driver.wait(until.elementLocated(locator), 1000); // 1 seconds
-    } catch (error) {
-      if (attempt < retries - 1) {
-        console.log(
-          `Element not found, refreshing page... Attempt ${attempt + 1}`
+export async function waitForText(page: Page, text: string, timeout = 5000) {
+  try {
+    await page.waitForFunction(
+      (text) => {
+        return [...document.querySelectorAll("*")].some((el) =>
+          el.textContent!.includes(text)
         );
-        await driver.navigate().refresh();
-        await isWebsiteLoaded(driver); // Wait for the page to reload
-      } else {
-        throw new Error("Element not found after multiple retries.");
-      }
-    }
+      },
+      { timeout },
+      text
+    );
+    console.log(`✅ Element containing text "${text}" found.`);
+    return true;
+  } catch (error) {
+    console.error(
+      `❌ Element containing text "${text}" not found within ${timeout}ms.`
+    );
+
+    return false;
   }
 }
 
-async function isWebsiteLoaded(driver: WebDriver) {
-  const logo = By.className("c-site-logo__image");
-  await driver.wait(until.elementLocated(logo));
+export const selectDropdownItem = async (
+  page: Page,
+  dropdownSelector: string,
+  value: string
+) => {
+  try {
+    await page.select(dropdownSelector, value);
+    console.log(`✅ Selected item with value "${value}" from dropdown.`);
+  } catch (error) {
+    console.log(
+      `❌ Failed to select item with value "${value}" from dropdown.`
+    );
+    console.error(error);
+  }
+};
+
+// delay function to pause execution for a specified time in milliseconds
+export function delay(time: number) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time);
+  });
 }

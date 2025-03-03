@@ -1,19 +1,23 @@
-import { WebDriver } from "selenium-webdriver";
-import { emailField, passwordField } from "../conselling-directory/variables";
+import { Page } from "puppeteer";
 
-export const isLoginPage = async (driver: WebDriver) => {
-  try {
-    await driver.findElement(passwordField);
+export const isLoginPage = async (page: Page) => {
+  const passwordInput = await page.$("input[type='password']");
+  if (passwordInput) {
     console.log("✅ Login page detected.");
-  } catch (error) {
+    await fillLoginPage(page);
+  } else {
     console.log("❌ Not a login page.");
   }
 };
 
-export const fillLoginPage = async (driver: WebDriver) => {
-  const email = await driver.findElement(emailField);
-  await email.sendKeys("*");
+export const fillLoginPage = async (page: Page) => {
+  try {
+    const emailField = await page.$("input[type='text']");
+    await emailField!.type("*");
 
-  const password = await driver.findElement(passwordField);
-  await password.sendKeys("*");
+    const passwordField = await page.$("input[type='password']");
+    await passwordField!.type("*");
+  } catch (error) {
+    console.log("❌ Failed to fill login page.");
+  }
 };

@@ -12,58 +12,78 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const readline_1 = __importDefault(require("readline"));
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const loginPage_1 = require("./pages/loginPage");
 const topListingsPage_1 = require("./pages/topListingsPage");
 const confirmationPage_1 = require("./pages/confirmationPage");
+// Create an interface for user input
+const rl = readline_1.default.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
 function StartAutomation() {
     return __awaiter(this, void 0, void 0, function* () {
-        const args = process.argv.slice(2); // Remove first two elements
-        const searchTerm = args[0];
-        if (searchTerm === undefined || searchTerm === "") {
-            throw new Error("❌ No search terms provided");
-        }
-        console.log(`Using "${searchTerm}" as the search term`);
-        const position = args[1];
-        if (position === undefined || searchTerm === null) {
-            throw new Error("❌ No position provided");
-        }
-        console.log(`"${position}" position selected`);
-        // Parse the date and time parameters (year, month, day, hour, minute)
-        const year = parseInt(args[2]);
-        const month = parseInt(args[3]) - 1; // JavaScript months are zero-indexed
-        const day = parseInt(args[4]);
-        const hour = parseInt(args[5]);
-        const minute = parseInt(args[6]);
-        if (isNaN(year) ||
-            isNaN(month) ||
-            isNaN(day) ||
-            isNaN(hour) ||
-            isNaN(minute)) {
-            throw new Error("❌ Invalid date and time parameters provided. Please provide year, month, day, hour, and minute.");
-        }
-        const targetDate = new Date(year, month, day, hour, minute);
-        console.log(`Target date and time: ${targetDate.toISOString()}`);
-        const url = "https://secure.counselling-directory.org.uk/members/toplistings.php";
-        const browser = yield puppeteer_1.default.launch({ headless: false });
-        const page = yield browser.newPage();
-        try {
-            yield page.goto(url);
-            yield page.setViewport({ width: 1080, height: 1024 });
-            yield (0, loginPage_1.isLoginPage)(page);
-            yield (0, topListingsPage_1.isTopListingsPage)(page);
-            yield (0, topListingsPage_1.changeSearchTerm)(page, searchTerm);
-            yield (0, topListingsPage_1.clickCheckAvailability)(page);
-            yield (0, topListingsPage_1.isSearchTermInTable)(page, searchTerm);
-            yield (0, topListingsPage_1.refreshBeforeTime)(page, targetDate, +position);
-            yield (0, confirmationPage_1.clickAcceptTsAndCs)(page);
-        }
-        catch (error) {
-            console.error("❌ Automation failed:", error);
-        }
-        finally {
-            yield browser.close();
-        }
+        // Prompt the user for searchTerm and position
+        rl.question("Enter the search term: ", (searchTerm) => {
+            if (!searchTerm) {
+                console.error("❌ No search term provided!");
+                rl.close();
+                return;
+            }
+            console.log(`Using "${searchTerm}" as the search term`);
+            rl.question("Enter the position (1 for first, 2 for second, 3 for third): ", (position) => {
+                if (!position) {
+                    console.error("❌ No position provided!");
+                    rl.close();
+                    return;
+                }
+                console.log(`Position ${position} selected`);
+                const currentYear = new Date().getFullYear();
+                // Prompt for target date and time (Year, Month, Day, Hour, Minute)
+                rl.question("Enter the month (e.g., 3 for March): ", (monthIndex) => {
+                    rl.question("Enter the day (e.g., 15): ", (day) => {
+                        rl.question("Enter the hour (0-23): ", (hour) => {
+                            rl.question("Enter the minute (0-59): ", (minute) => {
+                                const targetTime = new Date(+currentYear, +monthIndex - 1, +day, +hour, +minute);
+                                if (targetTime < new Date()) {
+                                    console.error("❌ The target time is in the past!");
+                                    rl.close();
+                                    return;
+                                }
+                                console.log(`Target time set for: ${targetTime.toISOString()}`);
+                                const url = "https://secure.counselling-directory.org.uk/members/toplistings.php";
+                                puppeteer_1.default
+                                    .launch({
+                                    headless: false,
+                                })
+                                    .then((browser) => __awaiter(this, void 0, void 0, function* () {
+                                    const page = yield browser.newPage();
+                                    try {
+                                        yield page.goto(url);
+                                        yield page.setViewport({ width: 1080, height: 1024 });
+                                        yield (0, loginPage_1.isLoginPage)(page);
+                                        yield (0, topListingsPage_1.waitForTopListingPage)(page);
+                                        yield (0, topListingsPage_1.changeSearchTerm)(page, searchTerm);
+                                        yield (0, topListingsPage_1.clickCheckAvailability)(page);
+                                        yield (0, topListingsPage_1.isSearchTermInTable)(page, searchTerm);
+                                        yield (0, topListingsPage_1.refreshBeforeTime)(page, targetTime, +position);
+                                        yield (0, confirmationPage_1.clickAcceptTsAndCs)(page);
+                                    }
+                                    catch (error) {
+                                        console.error("❌ Automation failed:", error);
+                                    }
+                                    finally {
+                                        yield browser.close();
+                                        rl.close();
+                                    }
+                                }));
+                            });
+                        });
+                    });
+                });
+            });
+        });
     });
 }
 StartAutomation();

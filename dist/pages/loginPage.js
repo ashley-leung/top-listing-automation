@@ -22,14 +22,9 @@ const isLoginPage = (page) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.isLoginPage = isLoginPage;
 const fillLoginPage = (page) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const emailField = yield page.$("input[type='text']");
-        yield emailField.type("*");
-        const passwordField = yield page.$("input[type='password']");
-        yield passwordField.type("*");
-    }
-    catch (error) {
-        console.log("❌ Failed to fill login page.");
-    }
+    const emailField = yield page.$("input[type='text']");
+    yield emailField.type("*");
+    const passwordField = yield page.$("input[type='password']");
+    yield passwordField.type("*");
 });
 exports.fillLoginPage = fillLoginPage;

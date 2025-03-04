@@ -11,13 +11,9 @@ export const isLoginPage = async (page: Page) => {
 };
 
 export const fillLoginPage = async (page: Page) => {
-  try {
-    const emailField = await page.$("input[type='text']");
-    await emailField!.type("*");
+  const emailField = await page.$("input[type='text']");
+  await emailField!.type("*");
 
-    const passwordField = await page.$("input[type='password']");
-    await passwordField!.type("*");
-  } catch (error) {
-    console.log("❌ Failed to fill login page.");
-  }
+  const passwordField = await page.$("input[type='password']");
+  await passwordField!.type("*");
 };

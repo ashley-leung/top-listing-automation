@@ -10,23 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.selectDropdownItem = void 0;
-exports.waitForText = waitForText;
 exports.delay = delay;
-function waitForText(page_1, text_1) {
-    return __awaiter(this, arguments, void 0, function* (page, text, timeout = 5000) {
-        try {
-            yield page.waitForFunction((text) => {
-                return [...document.querySelectorAll("*")].some((el) => el.textContent.includes(text));
-            }, { timeout }, text);
-            console.log(`✅ Element containing text "${text}" found.`);
-            return true;
-        }
-        catch (error) {
-            console.error(`❌ Element containing text "${text}" not found within ${timeout}ms.`);
-            return false;
-        }
-    });
-}
 const selectDropdownItem = (page, dropdownSelector, value) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield page.select(dropdownSelector, value);

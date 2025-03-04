@@ -1,28 +1,5 @@
 import { Page } from "puppeteer";
 
-export async function waitForText(page: Page, text: string, timeout = 10000) {
-  try {
-    await page.waitForFunction(
-      (text) => {
-        return [...document.querySelectorAll("*")].some((el) =>
-          el.textContent!.includes(text)
-        );
-      },
-      { timeout },
-      text
-    );
-
-    console.log(`✅ Element containing text "${text}" found.`);
-    return true;
-  } catch (error) {
-    console.error(
-      `❌ Element containing text "${text}" not found within ${timeout}ms.`
-    );
-
-    return false;
-  }
-}
-
 export const selectDropdownItem = async (
   page: Page,
   dropdownSelector: string,

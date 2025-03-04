@@ -9,26 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isSearchTermInTable = exports.clickCheckAvailability = exports.changeSearchTerm = exports.isTopListingsPage = void 0;
+exports.isSearchTermInTable = exports.clickCheckAvailability = exports.changeSearchTerm = exports.waitForTopListingPage = void 0;
 exports.refreshBeforeTime = refreshBeforeTime;
 const utils_1 = require("../utils/utils");
-const isTopListingsPage = (page) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, utils_1.waitForText)(page, "Top Listings");
-        console.log("✅ Top Listings Page detected.");
-    }
-    catch (error) {
-        throw new Error("❌ Top Listings Page not found.");
-    }
+const waitForTopListingPage = (page) => __awaiter(void 0, void 0, void 0, function* () {
+    yield page.$('select[name="search_term"]');
 });
-exports.isTopListingsPage = isTopListingsPage;
+exports.waitForTopListingPage = waitForTopListingPage;
 const changeSearchTerm = (page, searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, utils_1.selectDropdownItem)(page, 'select[name="search_term"]', searchTerm);
-    }
-    catch (error) {
-        console.error(error);
-    }
+    yield (0, utils_1.selectDropdownItem)(page, 'select[name="search_term"]', searchTerm);
 });
 exports.changeSearchTerm = changeSearchTerm;
 const clickCheckAvailability = (page) => __awaiter(void 0, void 0, void 0, function* () {
@@ -37,7 +26,7 @@ const clickCheckAvailability = (page) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.clickCheckAvailability = clickCheckAvailability;
 function refreshBeforeTime(page_1, targetTime_1, buyNowButtonPosition_1) {
-    return __awaiter(this, arguments, void 0, function* (page, targetTime, buyNowButtonPosition, refreshBefore = 5) {
+    return __awaiter(this, arguments, void 0, function* (page, targetTime, buyNowButtonPosition, refreshBefore = 10) {
         let now = new Date();
         const timeDifference = targetTime.getTime() - now.getTime();
         if (timeDifference <= 0) {
@@ -56,6 +45,7 @@ function refreshBeforeTime(page_1, targetTime_1, buyNowButtonPosition_1) {
             if (remainingTime <= 0) {
                 console.log(`🔄 Refreshing the page at ${new Date().toISOString()}`);
                 yield page.reload({ waitUntil: "domcontentloaded" });
+                yield page.waitForSelector('img[class="c-site-logo__image"]');
                 console.log(`✅ Page refreshed at ${new Date().toISOString()}`);
             }
             else {
@@ -69,18 +59,14 @@ function refreshBeforeTime(page_1, targetTime_1, buyNowButtonPosition_1) {
                 yield page.click(buyButton);
                 return; // Exit once the button is clicked
             }
-            yield (0, utils_1.delay)(1000); // Wait for 1 second using the delay function before checking again
+            let interval = Math.max(500, (remainingTime / (refreshBefore * 1000)) * 1000);
+            yield (0, utils_1.delay)(interval);
         }
     });
 }
 const isSearchTermInTable = (page, searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Waiting for '${searchTerm}' to be in the table!`);
-    yield page.waitForFunction((term) => {
-        var _a;
-        const table = document.querySelector("table");
-        return (_a = table === null || table === void 0 ? void 0 : table.innerText.includes(term)) !== null && _a !== void 0 ? _a : false;
-    }, { timeout: 5000 }, // wait for 1s
-    searchTerm);
+    yield page.waitForSelector(`::-p-xpath(//td[text()='${searchTerm}'])`);
     console.log(`'${searchTerm}' is now in the table!`);
 });
 exports.isSearchTermInTable = isSearchTermInTable;

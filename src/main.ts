@@ -5,8 +5,8 @@ import {
   changeSearchTerm,
   clickCheckAvailability,
   isSearchTermInTable,
-  isTopListingsPage,
   refreshBeforeTime,
+  waitForTopListingPage,
 } from "./pages/topListingsPage";
 import { clickAcceptTsAndCs } from "./pages/confirmationPage";
 
@@ -64,27 +64,31 @@ async function StartAutomation() {
                 const url =
                   "https://secure.counselling-directory.org.uk/members/toplistings.php";
 
-                puppeteer.launch({ headless: false }).then(async (browser) => {
-                  const page = await browser.newPage();
+                puppeteer
+                  .launch({
+                    headless: false,
+                  })
+                  .then(async (browser) => {
+                    const page = await browser.newPage();
 
-                  try {
-                    await page.goto(url);
-                    await page.setViewport({ width: 1080, height: 1024 });
+                    try {
+                      await page.goto(url);
+                      await page.setViewport({ width: 1080, height: 1024 });
 
-                    await isLoginPage(page);
-                    await isTopListingsPage(page);
-                    await changeSearchTerm(page, searchTerm);
-                    await clickCheckAvailability(page);
-                    await isSearchTermInTable(page, searchTerm);
-                    await refreshBeforeTime(page, targetTime, +position);
-                    await clickAcceptTsAndCs(page);
-                  } catch (error) {
-                    console.error("❌ Automation failed:", error);
-                  } finally {
-                    await browser.close();
-                    rl.close();
-                  }
-                });
+                      await isLoginPage(page);
+                      await waitForTopListingPage(page);
+                      await changeSearchTerm(page, searchTerm);
+                      await clickCheckAvailability(page);
+                      await isSearchTermInTable(page, searchTerm);
+                      await refreshBeforeTime(page, targetTime, +position);
+                      await clickAcceptTsAndCs(page);
+                    } catch (error) {
+                      console.error("❌ Automation failed:", error);
+                    } finally {
+                      await browser.close();
+                      rl.close();
+                    }
+                  });
               });
             });
           });

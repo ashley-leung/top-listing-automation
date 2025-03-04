@@ -1,20 +1,12 @@
 import { Page } from "puppeteer";
-import { delay, selectDropdownItem, waitForText } from "../utils/utils";
+import { delay, selectDropdownItem } from "../utils/utils";
 
-export const isTopListingsPage = async (page: Page) => {
-  const topListingsPageFound = await waitForText(page, "Top Listings");
-  if (!topListingsPageFound) {
-    console.error("❌ 'Top Listings' not found. Exiting application...");
-    process.exit(1); // Immediately stop the application with an error code
-  }
+export const waitForTopListingPage = async (page: Page) => {
+  await page.$('select[name="search_term"]');
 };
 
 export const changeSearchTerm = async (page: Page, searchTerm: string) => {
-  try {
-    await selectDropdownItem(page, 'select[name="search_term"]', searchTerm);
-  } catch (error) {
-    console.error(error);
-  }
+  await selectDropdownItem(page, 'select[name="search_term"]', searchTerm);
 };
 
 export const clickCheckAvailability = async (page: Page) => {
@@ -81,14 +73,7 @@ export async function refreshBeforeTime(
 
 export const isSearchTermInTable = async (page: Page, searchTerm: string) => {
   console.log(`Waiting for '${searchTerm}' to be in the table!`);
-  await page.waitForFunction(
-    (term) => {
-      const table = document.querySelector("table");
-      return table?.innerText.includes(term) ?? false;
-    },
-    { timeout: 5000 }, // wait for 1s
-    searchTerm
-  );
+  await page.waitForSelector(`::-p-xpath(//td[text()='${searchTerm}'])`);
 
   console.log(`'${searchTerm}' is now in the table!`);
 };

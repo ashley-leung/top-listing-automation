@@ -2,11 +2,15 @@ import { Page } from "puppeteer";
 import { delay, selectDropdownItem } from "../utils/utils";
 
 export const waitForTopListingPage = async (page: Page) => {
-  await page.$('select[name="search_term"]');
+  console.log("⏳ Waiting for Top Listing page to appear");
+  await page.waitForSelector('select[name="search_term"]');
+  console.log("✅ Top Listing page appeared");
 };
 
 export const changeSearchTerm = async (page: Page, searchTerm: string) => {
+  console.log(`⏳ Changing Search Term to ${searchTerm}`);
   await selectDropdownItem(page, 'select[name="search_term"]', searchTerm);
+  console.log(`✅ Search Term ${searchTerm} changed`);
 };
 
 export const clickCheckAvailability = async (page: Page) => {
@@ -49,7 +53,7 @@ export async function refreshBeforeTime(
       console.log(
         `⏳ Waiting to refresh... ${Math.floor(
           remainingTime / 1000
-        )} seconds remaining.`
+        )} seconds remaining`
       );
     }
 
@@ -58,8 +62,9 @@ export async function refreshBeforeTime(
     const buttonExists = (await page.$(buyButton)) !== null;
 
     if (buttonExists) {
-      console.log(`✅ "Buy Now" button appeared! Stopping refresh.`);
+      console.log(`✅ "Buy Now" button appeared! Stopping refresh`);
       await page.click(buyButton);
+      console.log(`✅ "Buy Now" button clicked`);
       return; // Exit once the button is clicked
     }
 
@@ -72,8 +77,8 @@ export async function refreshBeforeTime(
 }
 
 export const isSearchTermInTable = async (page: Page, searchTerm: string) => {
-  console.log(`Waiting for '${searchTerm}' to be in the table!`);
+  console.log(`⏳ Waiting for '${searchTerm}' to be in the table!`);
   await page.waitForSelector(`::-p-xpath(//td[text()='${searchTerm}'])`);
 
-  console.log(`'${searchTerm}' is now in the table!`);
+  console.log(`✅ '${searchTerm}' is now in the table!`);
 };

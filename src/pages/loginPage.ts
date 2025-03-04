@@ -16,4 +16,6 @@ export const fillLoginPage = async (page: Page) => {
 
   const passwordField = await page.$("input[type='password']");
   await passwordField!.type("*");
+
+  console.log("✅ Filled in dummy data into the login page");
 };

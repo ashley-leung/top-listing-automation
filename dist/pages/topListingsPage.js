@@ -13,11 +13,15 @@ exports.isSearchTermInTable = exports.clickCheckAvailability = exports.changeSea
 exports.refreshBeforeTime = refreshBeforeTime;
 const utils_1 = require("../utils/utils");
 const waitForTopListingPage = (page) => __awaiter(void 0, void 0, void 0, function* () {
-    yield page.$('select[name="search_term"]');
+    console.log("⏳ Waiting for Top Listing page to appear");
+    yield page.waitForSelector('select[name="search_term"]');
+    console.log("✅ Top Listing page appeared");
 });
 exports.waitForTopListingPage = waitForTopListingPage;
 const changeSearchTerm = (page, searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`⏳ Changing Search Term to ${searchTerm}`);
     yield (0, utils_1.selectDropdownItem)(page, 'select[name="search_term"]', searchTerm);
+    console.log(`✅ Search Term ${searchTerm} changed`);
 });
 exports.changeSearchTerm = changeSearchTerm;
 const clickCheckAvailability = (page) => __awaiter(void 0, void 0, void 0, function* () {
@@ -49,14 +53,15 @@ function refreshBeforeTime(page_1, targetTime_1, buyNowButtonPosition_1) {
                 console.log(`✅ Page refreshed at ${new Date().toISOString()}`);
             }
             else {
-                console.log(`⏳ Waiting to refresh... ${Math.floor(remainingTime / 1000)} seconds remaining.`);
+                console.log(`⏳ Waiting to refresh... ${Math.floor(remainingTime / 1000)} seconds remaining`);
             }
             // Check if "Buy Now" button is present
             const buyButton = `button#submitposition${buyNowButtonPosition}`;
             const buttonExists = (yield page.$(buyButton)) !== null;
             if (buttonExists) {
-                console.log(`✅ "Buy Now" button appeared! Stopping refresh.`);
+                console.log(`✅ "Buy Now" button appeared! Stopping refresh`);
                 yield page.click(buyButton);
+                console.log(`✅ "Buy Now" button clicked`);
                 return; // Exit once the button is clicked
             }
             let interval = Math.max(500, (remainingTime / (refreshBefore * 1000)) * 1000);
@@ -65,8 +70,8 @@ function refreshBeforeTime(page_1, targetTime_1, buyNowButtonPosition_1) {
     });
 }
 const isSearchTermInTable = (page, searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Waiting for '${searchTerm}' to be in the table!`);
+    console.log(`⏳ Waiting for '${searchTerm}' to be in the table!`);
     yield page.waitForSelector(`::-p-xpath(//td[text()='${searchTerm}'])`);
-    console.log(`'${searchTerm}' is now in the table!`);
+    console.log(`✅ '${searchTerm}' is now in the table!`);
 });
 exports.isSearchTermInTable = isSearchTermInTable;

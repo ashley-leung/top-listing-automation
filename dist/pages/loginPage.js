@@ -26,5 +26,6 @@ const fillLoginPage = (page) => __awaiter(void 0, void 0, void 0, function* () {
     yield emailField.type("*");
     const passwordField = yield page.$("input[type='password']");
     yield passwordField.type("*");
+    console.log("✅ Filled in dummy data into the login page");
 });
 exports.fillLoginPage = fillLoginPage;

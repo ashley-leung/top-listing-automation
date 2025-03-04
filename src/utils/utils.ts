@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
 
-export async function waitForText(page: Page, text: string, timeout = 5000) {
+export async function waitForText(page: Page, text: string, timeout = 10000) {
   try {
     await page.waitForFunction(
       (text) => {
@@ -11,6 +11,7 @@ export async function waitForText(page: Page, text: string, timeout = 5000) {
       { timeout },
       text
     );
+
     console.log(`✅ Element containing text "${text}" found.`);
     return true;
   } catch (error) {

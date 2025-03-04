@@ -2,11 +2,10 @@ import { Page } from "puppeteer";
 import { delay, selectDropdownItem, waitForText } from "../utils/utils";
 
 export const isTopListingsPage = async (page: Page) => {
-  try {
-    await waitForText(page, "Top Listings");
-    console.log("✅ Top Listings Page detected.");
-  } catch (error) {
-    throw new Error("❌ Top Listings Page not found.");
+  const topListingsPageFound = await waitForText(page, "Top Listings");
+  if (!topListingsPageFound) {
+    console.error("❌ 'Top Listings' not found. Exiting application...");
+    process.exit(1); // Immediately stop the application with an error code
   }
 };
 
@@ -27,7 +26,7 @@ export async function refreshBeforeTime(
   page: Page,
   targetTime: Date,
   buyNowButtonPosition: number,
-  refreshBefore: number = 5
+  refreshBefore: number = 10
 ) {
   let now = new Date();
   const timeDifference = targetTime.getTime() - now.getTime();
@@ -52,6 +51,7 @@ export async function refreshBeforeTime(
     if (remainingTime <= 0) {
       console.log(`🔄 Refreshing the page at ${new Date().toISOString()}`);
       await page.reload({ waitUntil: "domcontentloaded" });
+      await page.waitForSelector('img[class="c-site-logo__image"]');
       console.log(`✅ Page refreshed at ${new Date().toISOString()}`);
     } else {
       console.log(
@@ -71,7 +71,11 @@ export async function refreshBeforeTime(
       return; // Exit once the button is clicked
     }
 
-    await delay(1000); // Wait for 1 second using the delay function before checking again
+    let interval = Math.max(
+      500,
+      (remainingTime / (refreshBefore * 1000)) * 1000
+    );
+    await delay(interval);
   }
 }
 

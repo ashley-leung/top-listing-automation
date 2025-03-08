@@ -69,6 +69,7 @@ function StartAutomation() {
                                         yield (0, topListingsPage_1.isSearchTermInTable)(page, searchTerm);
                                         yield (0, topListingsPage_1.refreshBeforeTime)(page, targetTime, +position);
                                         yield (0, confirmationPage_1.clickAcceptTsAndCs)(page);
+                                        yield (0, confirmationPage_1.clickCompletePayment)(page);
                                     }
                                     catch (error) {
                                         console.error("❌ Automation failed:", error);

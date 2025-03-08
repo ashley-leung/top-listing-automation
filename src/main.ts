@@ -8,7 +8,10 @@ import {
   refreshBeforeTime,
   waitForTopListingPage,
 } from "./pages/topListingsPage";
-import { clickAcceptTsAndCs } from "./pages/confirmationPage";
+import {
+  clickAcceptTsAndCs,
+  clickCompletePayment,
+} from "./pages/confirmationPage";
 
 // Create an interface for user input
 const rl = readline.createInterface({
@@ -82,6 +85,7 @@ async function StartAutomation() {
                       await isSearchTermInTable(page, searchTerm);
                       await refreshBeforeTime(page, targetTime, +position);
                       await clickAcceptTsAndCs(page);
+                      await clickCompletePayment(page);
                     } catch (error) {
                       console.error("❌ Automation failed:", error);
                     } finally {

@@ -9,9 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clickAcceptTsAndCs = void 0;
+exports.clickCompletePayment = exports.clickAcceptTsAndCs = void 0;
 const clickAcceptTsAndCs = (page) => __awaiter(void 0, void 0, void 0, function* () {
     yield page.click('input[type="checkbox"]');
     console.log("✅ Clicked Accept Terms and Conditions checkbox");
 });
 exports.clickAcceptTsAndCs = clickAcceptTsAndCs;
+const clickCompletePayment = (page) => __awaiter(void 0, void 0, void 0, function* () {
+    yield page.click('button[type="submit"]');
+});
+exports.clickCompletePayment = clickCompletePayment;

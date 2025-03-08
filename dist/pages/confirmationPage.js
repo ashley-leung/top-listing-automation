@@ -16,6 +16,11 @@ const clickAcceptTsAndCs = (page) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.clickAcceptTsAndCs = clickAcceptTsAndCs;
 const clickCompletePayment = (page) => __awaiter(void 0, void 0, void 0, function* () {
-    yield page.click('button[type="submit"]');
+    const completePayment = 'button[type="submit"][value="Complete payment"]';
+    const button = yield page.$(completePayment);
+    if (button === null) {
+        throw new Error("Complete payment button not found");
+    }
+    yield page.click(completePayment);
 });
 exports.clickCompletePayment = clickCompletePayment;

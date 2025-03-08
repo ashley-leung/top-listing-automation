@@ -6,5 +6,11 @@ export const clickAcceptTsAndCs = async (page: Page) => {
 };
 
 export const clickCompletePayment = async (page: Page) => {
-  await page.click('button[type="submit"]');
+  const completePayment = 'button[type="submit"][value="Complete payment"]';
+  const button = await page.$(completePayment);
+
+  if (button === null) {
+    throw new Error("Complete payment button not found");
+  }
+  await page.click(completePayment);
 };
